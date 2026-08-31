@@ -1,5 +1,7 @@
 # 排序论文雷达
 
+> 本文件是跨方向统一评分索引。三个方向的独立技术脉络与研究点请分别阅读 [三维重建](01-3d-reconstruction.md)、[仿真与数字孪生](02-simulation-digital-twins.md)、[机器人](03-robotics.md)；交叉机会单列在 [04-cross-track-opportunities.md](04-cross-track-opportunities.md)。
+
 评分采用 skill 的六维量表：主题匹配 35、方法价值 20、来源质量 15、跨方向桥接 10、应用价值 10、长期价值 10。`A/core` 为 80–100，`B/bridge` 为 65–79。分数用于研究优先级，不等同于论文质量或引用影响力。
 
 ## A. 行星直接相关

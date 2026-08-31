@@ -6,6 +6,7 @@
 - 主窗口：2024-08-31 至 2026-08-31
 - 语言：英语为主；中文任务词用于后续扩展，本轮未对 CNKI/万方作系统覆盖
 - 输出模式：发现 + 排序 + gap analysis + brief reading
+- 组织方式：三个方向先独立检索和筛选，再进行两两交叉及三方向闭环综合
 - 去重：优先规范化 DOI；无 DOI 时使用规范化标题 + 第一作者；出版版本优先于预印本
 
 ## 查询族
@@ -51,6 +52,30 @@ physics-based sensor simulation lunar ground operations Chrono dust
 ```text
 (visual geometry transformer OR 3D reconstruction prior OR Gaussian SLAM OR neural map) AND robot
 (real-to-sim-to-real OR online dynamics adaptation OR multiphysics benchmark) AND robot
+```
+
+### 三维重建独立补检
+
+```text
+site:openaccess.thecvf.com/content/CVPR2025 3D reconstruction multi-view pointmap foundation model
+site:openaccess.thecvf.com/content/CVPR2026 visual geometry transformer efficiency outlier reconstruction
+site:ecva.net/papers/eccv_2024 generalizable reconstruction neural rendering
+```
+
+### 仿真/数字孪生独立补检
+
+```text
+site:roboticsproceedings.org/rss21 simulation platform digital twin robot 2025
+lunar rover deformable terrain elastic wheel simulation 2025 2026
+low-gravity granular scaling law wheel mobility slope
+```
+
+### 机器人独立补检
+
+```text
+site:roboticsproceedings.org/rss21 robot navigation planning control learning world model terrain
+site:openaccess.thecvf.com/content/CVPR2025 robot navigation world models
+site:roboticsproceedings.org/rss21 sim-to-real generalist policy spatial VLA task motion planning
 ```
 
 定向官方站点查询覆盖 CVF 2025/2026、RSS 2024/2025、Wiley Journal of Field Robotics、Elsevier/DOI、IEEE 记录和 arXiv。
