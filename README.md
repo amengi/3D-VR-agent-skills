@@ -30,3 +30,7 @@ The skill has also passed the Codex `skill-creator` structural validator.
 ## Use
 
 Invoke the skill as `$planetary-3d-robotics-radar`, or install/copy the skill directory into the skill path used by your compatible agent host.
+
+## Research outputs
+
+- [2026-08-31 planetary 3D robotics research radar](research-radar/2026-08-31/README.md): ranked recent papers, brief readings, cross-paper research directions, and a reproducible query log.
