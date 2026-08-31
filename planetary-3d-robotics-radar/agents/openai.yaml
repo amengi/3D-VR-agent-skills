@@ -1,0 +1,6 @@
+interface:
+  display_name: "Planetary 3D Robotics Radar"
+  short_description: "检索并综合行星三维重建、仿真与机器人前沿研究"
+  default_prompt: "Use $planetary-3d-robotics-radar to search, verify, and synthesize the latest two years of planetary 3D reconstruction, simulation, and robotics research."
+policy:
+  allow_implicit_invocation: true
