@@ -70,12 +70,14 @@ lunar rover deformable terrain elastic wheel simulation 2025 2026
 low-gravity granular scaling law wheel mobility slope
 ```
 
-### 机器人独立补检
+### 机器人视觉与具身视觉补检
 
 ```text
-site:roboticsproceedings.org/rss21 robot navigation planning control learning world model terrain
-site:openaccess.thecvf.com/content/CVPR2025 robot navigation world models
-site:roboticsproceedings.org/rss21 sim-to-real generalist policy spatial VLA task motion planning
+site:openaccess.thecvf.com/content/CVPR2025 robot perception 3D manipulation visual navigation world model
+site:openaccess.thecvf.com/content/ICCV2025 embodied world model 4D robot vision
+site:roboticsproceedings.org/rss21 visual perception navigation active mapping spatial VLA manipulation
+site:2024.corl.org embodied Gaussian splatting robot visual imitation
+site:roboticsconference.org/program/papers 2026 perception vision mapping manipulation world model
 ```
 
 ### 2026-09-01 发展脉络重构补检
@@ -89,6 +91,8 @@ site:2026.ieee-icra.org awards robot learning perception automation
 site:openaccess.thecvf.com/content/CVPR2026 3D reconstruction VGGT
 2025 2026 lunar rover simulation digital twin terramechanics Journal of Field Robotics
 ```
+
+其中 `robotics milestones ...` 属于上一版“机器人学本体”宽口径查询。本次根据用户澄清将方向三收窄为计算机视觉主导，A*、阻抗控制、RRT、执行器和纯动力学工作不再纳入方向三核心文献。
 
 定向官方站点查询覆盖 CVF 2024–2026、ECCV 2024、RSS 2023–2026、ICRA 2024/2026、Wiley Journal of Field Robotics、Elsevier/DOI、IEEE、NASA NTRS、PMLR/JMLR 和 arXiv。
 
@@ -107,6 +111,7 @@ site:openaccess.thecvf.com/content/CVPR2026 3D reconstruction VGGT
 - 对三个方向分别建立了学科范式或能解释当前路线来源的经典工作；
 - 近两年在 CVPR/ICCV/ECCV、RSS/ICRA 或领域代表期刊发表且具有明确方法/系统代表性的工作；
 - 仿真方向额外纳入直接使用月球/火星环境、轮壤、低重力或任务数字孪生的领域论文；
+- 方向三要求核心贡献落在视觉表示、视觉感知/理解、视觉定位建图、主动视觉、视觉导航、视觉操作或视觉世界模型，并有机器人任务验证；
 - 有官方会议、出版社、DOI 或明确预印本记录。
 
 排除/降级：
@@ -115,6 +120,7 @@ site:openaccess.thecvf.com/content/CVPR2026 3D reconstruction VGGT
 - 仅因标题含 digital twin/robot/3D 而没有清晰问题、方法或验证贡献；
 - 把 arXiv 默认为同行评议；
 - 只因能与另外两个方向交叉而入选、但在本方向本身缺乏代表性的论文；
+- 纯机器人机构、材料、驱动器、控制、动力学辨识或不含视觉机制的一般 RL；
 - 仅有平均指标提升、没有方法机制或可靠性信息的增量工作。
 
 ## 已知覆盖偏差

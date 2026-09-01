@@ -1,159 +1,186 @@
-# 方向三：机器人——从经典范式到具身基础模型
+# 方向三：面向机器人任务的机器视觉与具身视觉
 
 > 更新日：2026-09-01；近两年窗口：2024-09-01—2026-08-31。
 
-本章只讨论机器人学本身，不要求论文涉及三维重建、仿真或行星任务。筛选首先看它是否改变了机器人学中的问题定义、方法范式或实验标准；与另外两个方向的连接统一留在 `04-cross-track-opportunities.md`。
+本章采用计算机学院/计算机视觉视角：研究对象是**如何让机器从视觉观测中形成可用于定位、导航、搜索、抓取、操作和交互的表示与预测**。机器人主要是视觉算法的任务载体和闭环验证平台，而不是研究机械本体、执行器设计、纯动力学或底层控制。
 
-## 1. 如何理解机器人学的主干
+## 1. 研究边界与主线
+
+### 纳入
+
+- 视觉定位、视觉里程计、SLAM、语义/开放词汇地图；
+- RGB/RGB-D/点云/多视图的任务导向三维感知；
+- 目标、部件、姿态、可供性（affordance）与接触区域理解；
+- 视觉导航、视觉语言导航（VLN）、主动视觉与 next-best-view；
+- 视觉操作、视觉模仿、VLA 中的视觉/空间表示；
+- 视觉世界模型、4D 场景预测和用视觉后果支持规划。
+
+### 不作为本章核心
+
+- 纯机械机构、材料、驱动器和机器人本体设计；
+- 不依赖视觉贡献的纯控制、轨迹优化、动力学辨识或一般强化学习；
+- 只提高语言推理或模型规模、却没有视觉空间机制和机器人任务验证的工作。
 
 ```text
-感知与状态估计 → 建模与预测 → 规划与决策 → 控制与接触 → 真实系统反馈
-          ↑                                                ↓
-          └──────────── 学习、辨识、安全与系统设计 ────────────┘
+图像/视频/深度/点云
+        ↓
+视觉表征与几何—语义理解
+        ↓
+可定位、可查询、可更新的场景表示
+        ↓
+导航 / 搜索 / 抓取 / 操作 / 交互
+        ↑
+主动观测与任务反馈
 ```
-
-机器人学不是单一的“机器人 AI”。本章同时保留模型驱动与数据驱动路线，并覆盖移动、操作、腿足、触觉和通用策略。单看 VLA（vision-language-action）会漏掉控制、安全和接触；单看经典规划控制又解释不了近年的跨任务泛化。
 
 ## 2. 代表性经典论文与发展脉络
 
-经典并不等于“今天应原样复现”，而是它建立了后来研究仍在回答的问题。
-
-| 阶段 | 代表工作 | 建立的范式 | 留给今天的问题 |
+| 阶段 | 代表工作 | 对“视觉 + 机器人任务”的贡献 | 当前仍未解决的问题 |
 |---|---|---|---|
-| 图搜索与任务规划（1968） | [A Formal Basis for the Heuristic Determination of Minimum Cost Paths](https://doi.org/10.1109/TSSC.1968.300136)（A*） | 把目标、代价与启发式搜索统一起来 | 学习启发式如何保留完备性、最优性或可解释的次优界？ |
-| 力与接触控制（1985–1987） | [Impedance Control](https://doi.org/10.1115/1.3140702)；[Operational Space Formulation](https://doi.org/10.1109/JRA.1987.1087068) | 不只跟踪位置，还规定机器人与环境交互的动力学关系 | 学习策略如何继承稳定性、被动性与接触约束？ |
-| 反应式机器人（1986） | [A Robust Layered Control System for a Mobile Robot](https://doi.org/10.1109/JRA.1986.1087032) | 以分层行为代替完整世界模型，强调实时闭环 | 世界模型应建到多复杂，何时反而拖慢或误导控制？ |
-| 采样式运动规划（1998） | [Rapidly-Exploring Random Trees](https://msl.cs.illinois.edu/~lavalle/papers/Lav98c.pdf) | 在高维连续空间中快速探索可行轨迹 | 如何把学习先验与严格碰撞/动力学约束组合？ |
-| 概率机器人（1999–2006） | [Monte Carlo Localization](https://robots.stanford.edu/papers/fox.aaai99.pdf)；[FastSLAM](https://www.cs.cmu.edu/~motionplanning/papers/sbp_papers/integrated1/montemerlo_fastslam.pdf)；[GraphSLAM](https://robots.stanford.edu/papers/thrun.graphslam.pdf) | 用概率分布和图优化处理感知噪声、数据关联与漂移 | 神经感知置信度怎样变成可校准、可传播的后验或集合？ |
-| 大规模机器人学习（2016–2018） | [End-to-End Training of Deep Visuomotor Policies](https://www.jmlr.org/papers/v17/15-522.html)；[Domain Randomization](https://doi.org/10.1109/IROS.2017.8202133)；[QT-Opt](https://arxiv.org/abs/1806.10293) | 从手工模块转向数据驱动闭环，并用仿真或大规模试验扩展数据 | 数据覆盖、离线评价、长尾失败与 sim-to-real 成为核心瓶颈 |
-| 序列策略与生成式动作（2022–2023） | [RT-1](https://arxiv.org/abs/2212.06817)；[Diffusion Policy](https://www.roboticsproceedings.org/rss19/p026.html)；[RT-2](https://arxiv.org/abs/2307.15818) | Transformer/VLM 提供语义迁移，扩散模型表达多峰连续动作 | 语言理解是否真正转化成可执行、精确和鲁棒的物理技能？ |
-| 跨具身数据与开放模型（2024，窗口前锚点） | [Open X-Embodiment / RT-X](https://doi.org/10.1109/ICRA57147.2024.10611477)；[Octo](https://www.roboticsproceedings.org/rss20/p127.html)；[OpenVLA](https://www.roboticsproceedings.org/rss20/p133.html) | 多机器人数据、统一动作接口和开放通用策略成为可复现实验对象 | 具身差异、动作标定、数据质量和后训练方式仍未解决 |
+| 视觉反馈控制（1996） | [A Tutorial on Visual Servo Control](https://doi.org/10.1109/70.538972) | 建立 image-based / position-based visual servoing 的基本闭环：视觉误差直接驱动任务 | 感知延迟、遮挡、深度误差和 learned representation 下的稳定性 |
+| 实时视觉 SLAM（2007） | [MonoSLAM](https://doi.org/10.1109/TPAMI.2007.1049)；[Parallel Tracking and Mapping](https://doi.org/10.1109/ISMAR.2007.4538852) | 证明单目相机可实时联合跟踪与建图，并形成前后端分工 | 尺度、动态、重定位、长期变化和弱纹理 |
+| 特征式可复现 SLAM（2015） | [ORB-SLAM](https://doi.org/10.1109/TRO.2015.2463671) | 用统一 ORB 特征贯穿跟踪、建图、重定位和回环，成为视觉 SLAM 重要系统基线 | 手工特征在极端光照、重复纹理和域外场景仍会失效 |
+| 点云深度表征（2017） | [PointNet](https://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html) | 直接学习无序点集，为三维检测、分割和机器人点云理解建立通用算子 | 局部结构、尺度变化、稀疏观测与时序一致性 |
+| 视觉六自由度姿态（2019） | [DenseFusion](https://openaccess.thecvf.com/content_CVPR_2019/html/Wang_DenseFusion_6D_Object_Pose_Estimation_by_Iterative_Dense_Fusion_CVPR_2019_paper.html) | 稠密融合 RGB 与深度特征估计物体 6D pose，把多模态视觉直接接入抓取/操作 | 遮挡、透明/反光物体、类别级泛化与姿态不确定性 |
+| 具身视觉 benchmark（2019） | [Habitat](https://openaccess.thecvf.com/content_ICCV_2019/html/Savva_Habitat_A_Platform_for_Embodied_AI_Research_ICCV_2019_paper.html) | 把视觉导航变成可复现的大规模 embodied AI 问题，推动 ObjectNav、VLN 和主动探索 | 仿真视觉偏差、任务定义简化和真实部署差距 |
+| 任务空间视觉操作（2020） | [Transporter Networks](https://proceedings.mlr.press/v155/zeng21a.html) | 用视觉注意力和特征相关在像素空间表达 pick-and-place，展示强空间归纳偏置 | 更复杂 6-DoF、接触、长时程和多模态条件 |
+| 机器人视觉预训练（2022–2023） | [R3M](https://proceedings.mlr.press/v205/nair23a.html)；[VC-1](https://proceedings.mlr.press/v229/majumdar23a.html) | 从大规模视频/图像获得可迁移视觉表示，开始系统比较通用视觉 encoder 对机器人任务的价值 | 预训练目标与动作、几何、接触需求仍错位 |
+| 生成式视觉动作策略（2023） | [Diffusion Policy](https://www.roboticsproceedings.org/rss19/p026.html) | 将视觉观测映射为多峰动作序列，成为视觉操作强基线 | 视觉错误归因、长时程记忆、实时性和失败恢复 |
+| 跨具身视觉—动作模型（2024，窗口前锚点） | [Open X-Embodiment / RT-X](https://doi.org/10.1109/ICRA57147.2024.10611477)；[OpenVLA](https://www.roboticsproceedings.org/rss20/p133.html) | 用多机器人视觉动作数据和 VLM backbone 建立通用 VLA 路线 | 三维空间、动作坐标系、数据质量和真实长尾仍是瓶颈 |
 
 ### 脉络判断
 
-机器人学没有从“模型”单向进化到“端到端学习”。更准确的历史是：搜索、优化、反馈控制和概率估计提供约束与结构；深度学习扩大感知与策略的覆盖；当前前沿正在寻找两者的系统级接口。
+该方向的演进不是“视觉模块被端到端策略取代”，而是视觉输出从特征点和位姿，扩展为对象、部件、可供性、三维场景、动态未来与语言条件动作。真正值得研究的是：**哪一种视觉表示能以更少数据、更低延迟和更可控的失败方式改善真实任务**。
 
-## 3. 近两年顶会顶刊代表作
+## 3. 近两年顶会代表作
 
-以下不是按与本仓库其他方向的交叉程度选择，而是按机器人学独立代表性选择。`顶会/奖项` 只按会议官方页面确认；预印本不伪装成顶会论文。
+以下按视觉贡献与任务闭环筛选。CVPR/ICCV 工作强调计算机视觉方法，RSS/CoRL/ICRA 工作用于验证这些视觉表示是否真正服务机器人任务。
 
-| 主线 | 代表论文 | Venue / 年份 | 为什么值得读 | 主要边界 |
+| 主线 | 代表论文 | Venue / 年份 | 视觉贡献与任务意义 | 主要边界 |
 |---|---|---|---|---|
-| 通用机器人策略 | [π₀: A Vision-Language-Action Flow Model for General Robot Control](https://www.roboticsproceedings.org/rss21/p010.html) | RSS 2025 | 将预训练 VLM 与 flow-matching action expert 组合，并在多种单臂、双臂和移动操作任务上研究通用策略及后训练 | 仍高度依赖大规模私有数据与高质量后训练；开放复现成本高 |
-| 空间表征 | [SpatialVLA](https://www.roboticsproceedings.org/rss21/p011.html) | RSS 2025 | 以 Ego3D position encoding 和 adaptive action grids 显式处理三维空间与跨机器人动作迁移 | 结果不能说明一种动作离散化可无条件覆盖新机构和精细接触 |
-| 数据引擎 | [RLDG](https://www.roboticsproceedings.org/rss21/p028.html) | RSS 2025 | 用任务专用 RL 生成更优状态—动作覆盖，再蒸馏回 generalist policy；论文报告部分任务最高约 40% 成功率提升 | RL 数据生成成本高，且可能继承 simulator/reward artifact |
-| 语义与物理规划 | [Prompting with the Future](https://www.roboticsproceedings.org/rss21/p145.html) | RSS 2025 | 用交互式数字孪生模拟候选动作，再让 VLM 做任务相关排序，展示“语义模型 + 显式物理 + MPC”的组合 | 依赖快速场景建模和可用物理模型；长时程误差会累积 |
-| 安全在线辨识 | [Provably-Safe, Online System Identification](https://www.roboticsproceedings.org/rss21/p121.html) | RSS 2025 | 在避障和输入/状态约束下生成激励轨迹，并给未知载荷惯量参数计算严格包络 | 保证依赖有界噪声和模型集合；复杂接触与柔性物体仍困难 |
-| 非结构地形适配 | [Adaptive Locomotion on Mud](https://www.roboticsproceedings.org/rss21/p126.html) | RSS 2025 | 用电机电流和位置等本体感受在线估计基底性质，并据此改变运动策略 | 平台和材料范围有限，跨机器人、跨土壤泛化尚未建立 |
-| 高维强化学习 | [FlashSAC](https://roboticsconference.org/program/awards/) | RSS 2026 Outstanding Paper | 官方奖项表明高维机器人控制中“更快且更稳定的 off-policy RL”仍是主问题，不只有基础模型扩展 | 需结合正文进一步核对跨任务、算力与真实机器人边界 |
-| 动力学与系统建模 | [NeuralActuator](https://roboticsconference.org/program/awards/) | RSS 2026 Outstanding Systems Paper | 把执行器神经建模同时用于机器人动力学与外力感知，体现模型误差对控制系统的基础影响 | 神经执行器模型的分布外稳定性与跨硬件迁移仍需单独验证 |
-| 快速生成式规划 | [Muninn](https://roboticsconference.org/program/awards/) | RSS 2026 Outstanding Student Paper | 针对 trajectory diffusion 的推理速度瓶颈，说明生成式规划开始进入实时性竞争 | “更快”不等于闭环更安全，需报告失效尾部和实时控制预算 |
-| 三维操作策略 | [FP3: A 3D Foundation Policy for Robotic Manipulation](https://2026.ieee-icra.org/awards/) | ICRA 2026 Robot Learning Award Finalist | 官方奖项候选，代表从 2D VLA 向三维几何条件策略推进 | 奖项页只能支持代表性，方法与实验结论需以正式论文全文为准 |
-| 触觉仿真与操作 | [ETac](https://2026.ieee-icra.org/awards/) | ICRA 2026 Automation Award Finalist | 代表轻量触觉仿真开始成为灵巧操作的数据与评价基础设施 | 触觉模拟的传感器依赖性、接触材料覆盖与 sim-to-real 是关键边界 |
+| 三维视觉预训练 | [3D-MVP: 3D Multiview Pretraining for Manipulation](https://openaccess.thecvf.com/content/CVPR2025/html/Qian_3D-MVP_3D_Multiview_Pretraining_for_Manipulation_CVPR_2025_paper.html) | CVPR 2025 | 用 Objaverse 多视 RGB-D masked pretraining 学习三维视觉 encoder，并接入 RVT 操作策略 | 主要在虚拟操作任务评价；真实材质、遮挡和传感噪声需扩展 |
+| 视觉导航世界模型 | [Navigation World Models](https://openaccess.thecvf.com/content/CVPR2025/html/Bar_Navigation_World_Models_CVPR_2025_paper.html) | CVPR 2025 | 以动作条件视频生成预测未来视觉观测，用于从头规划或候选轨迹排序 | 像素未来不保证 metric/碰撞正确；长时程生成误差会累积 |
+| 4D 具身世界模型 | [Learning 4D Embodied World Models](https://openaccess.thecvf.com/content/ICCV2025/html/Zhen_Learning_4D_Embodied_World_Models_ICCV_2025_paper.html) | ICCV 2025 | 联合生成 RGB、depth、normal，形成随动作演化的 4D 场景并服务 inverse dynamics / policy learning | 深度和法线部分由现成模型扩充，伪标签误差可能进入世界模型 |
+| 空间化 VLA | [SpatialVLA](https://www.roboticsproceedings.org/rss21/p011.html) | RSS 2025 | 以 Ego3D position encoding 和 adaptive action grids 将三维空间信息注入 VLA | 仍需区分视觉表征收益与大规模数据/后训练收益 |
+| 统一视觉导航 | [Uni-NaVid](https://www.roboticsproceedings.org/rss21/p013.html) | RSS 2025 | 从 egocentric RGB video + language 统一多类导航任务，并以时空 token merge 支持在线推理 | 端到端动作难以诊断；benchmark 协同不等于真实开放世界泛化 |
+| 分层视觉语言导航 | [NaVILA](https://www.roboticsproceedings.org/rss21/p018.html) | RSS 2025 | VLA 输出带空间含义的中层语言动作，再交给 locomotion policy，保留视觉语义与执行接口 | 中层语言动作的几何精度、歧义和闭环纠错仍需分析 |
+| 交互式主动感知 | [Map Space Belief Prediction for Manipulation-Enhanced Mapping](https://www.roboticsproceedings.org/rss21/p039.html) | RSS 2025 | 联合推理对象几何、位置、类别、遮挡和操作后果，用移动物体减少语义地图不确定性 | 货架场景和动作模型较受限；复杂对象动力学会破坏 belief update |
+| 可更新视觉世界模型 | [Physically Embodied Gaussian Splatting](https://2024.corl.org/program/papers-xx) | CoRL 2024 | 将 Gaussian Splatting 变成可由机器人交互实时修正的场景世界模型 | CoRL 总目录可确认收录；具体数值与模块需回到论文全文核验 |
+| 操作用视觉重建 | [Robo3R](https://roboticsconference.org/program/papers/56/) | RSS 2026 | 从 RGB 和 robot state 实时预测 metric-scale、robot-frame 的精细点云，服务模仿、抓取、避碰和 sim-to-real | 对训练合成数据、相机/机器人状态标定和未知材质的依赖需验证 |
+| 视觉想象自改进 | [Self-Improving Robot Policy with Compositional World Model](https://roboticsconference.org/program/papers/12/) | RSS 2026 | 多视未来预测与 progress value 分开建模，在想象 rollout 中改进视觉操作策略 | 想象偏差可能被 value model 放大；需真实失败分布校准 |
+| 开放词汇地图 | [FindAnything](https://2026.ieee-icra.org/awards/) | ICRA 2026 Robot Perception Award Finalist | 代表 object-centric、open-vocabulary mapping 用于机器人探索 | 奖项页只支持论文身份和代表性，方法结论需以正式全文为准 |
 
 ### 近两年真正发生的变化
 
-1. **通用策略从“预训练一次”转向“预训练 + 高质量后训练 + 在线/离线改进”**：π₀、RLDG 等路线都说明，后训练数据比继续堆通用示范更值得研究。
-2. **空间与接触重新成为核心变量**：SpatialVLA、FP3 和触觉工作都在修补纯 2D 语义模型对几何、力和动作机构理解不足的问题。
-3. **世界模型开始承担候选预测，不再被默认当作完整控制器**：Prompting with the Future 是一个清晰例子；硬约束、反馈控制和安全后端仍不可省略。
-4. **学习系统重新重视辨识、稳定和实时性**：Provably-Safe SysID、NeuralActuator、FlashSAC、Muninn 说明“能跑、可控、可验证”正在成为第二轮竞争。
+1. **视觉预训练从 2D 语义转向 3D/时空任务表征**：3D-MVP、SpatialVLA 与 4D world model 都在显式补空间和动态。
+2. **地图从被动记录转向任务可查询、可交互更新**：Map Space Belief、Physically Embodied GS、FindAnything 关注对象、遮挡、行动和开放词汇查询。
+3. **视觉世界模型从“生成视频”转向“比较行动后果”**：NWM 与 4D/组合式世界模型把预测接入规划或策略改进，但仍需几何与不确定性约束。
+4. **导航与操作开始共享视频/VLM backbone，但任务接口仍关键**：Uni-NaVid 走统一端到端路线，NaVILA 走中层空间动作路线，两者构成值得比较的系统选择。
 
 ## 4. 重点论文简要 Reading
 
-### 4.1 π₀：通用策略的关键不只是 VLM
+### 4.1 3D-MVP：视觉预训练目标要与机器人空间任务匹配
 
-- **WHY**：单任务策略缺少泛化，而把 VLM 直接离散成 action token 又不擅长精细、连续、灵巧动作。
-- **HOW**：保留 VLM 的视觉—语言语义能力，增加独立 action expert，以 flow matching 生成连续动作，并用跨具身数据预训练、用高质量任务数据后训练。
-- **WHAT**：论文展示了直接提示、任务专门化和新技能微调三种使用方式，覆盖洗衣、清理和装配等多阶段任务。
-- **读后判断**：真正可迁移的研究问题是“通用先验和任务专长怎样分工”，而不是简单复制模型规模。
-- **应补实验**：固定模型与总数据量，只改变数据质量、任务覆盖和后训练机制；同时报告平均成功率、最差任务、干预次数与恢复率。
+- **WHY**：通用 2D MAE 能提供语义，但操作需要从多视观测推断三维位置、遮挡与末端姿态。
+- **HOW**：将 RVT 拆为视觉 encoder 和 action decoder，在 Objaverse 多视 RGB-D 上通过 masked reconstruction 预训练 encoder。
+- **WHAT**：CVPR 论文报告其在一组虚拟机器人操作任务上优于 2D 视觉预训练基线。
+- **读后判断**：核心不是“使用更多 3D 数据”，而是预训练中保留跨视图对应和可执行空间结构。
+- **应补实验**：固定 backbone 与数据规模，比较 2D MAE、多视一致性、depth/normal、point correspondence 和 action-conditioned pretraining。
 
-### 4.2 RLDG：数据质量可以由交互优化产生
+### 4.2 Navigation World Models：用视觉生成做反事实导航
 
-- **WHY**：人类示范往往集中在成功轨迹附近，缺少精密任务所需的纠错状态和更优动作分布。
-- **HOW**：为专门任务训练 RL policy，用其生成数据，再蒸馏/微调 generalist policy。
-- **WHAT**：官方摘要报告在连接器插入、装配等真实任务上持续优于人类示范数据训练，并把收益归因于动作分布和状态覆盖。
-- **读后判断**：这是一种“专家数据工厂”，但是否优于主动采样、自动课程或失败回放仍需预算公平比较。
-- **应补实验**：固定真实机器人小时数与仿真步数，比较 human demo、RL rollout、uncertainty sampling、failure replay 及其混合。
+- **WHY**：监督导航策略只能复现训练行为，遇到新约束时缺少“如果这样走会看到什么”的预测能力。
+- **HOW**：Conditional Diffusion Transformer 根据历史观测和导航动作生成未来视觉观测，再评价是否到达目标或对外部策略候选排序。
+- **WHAT**：论文展示熟悉环境中的视觉轨迹规划，以及从单幅输入图像对陌生环境进行未来想象。
+- **读后判断**：它提供柔性的视觉预测先验，但像素合理性与可通行性、尺度和碰撞安全不是同一概念。
+- **应补实验**：同时评估视频质量、深度/光流一致性、碰撞预测、候选排序校准和闭环任务成功率。
 
-### 4.3 Prompting with the Future：让 VLM 看模拟后果
+### 4.3 Learning 4D Embodied World Models：从 2D 视频未来走向空间—时间未来
 
-- **WHY**：VLM 能理解任务语义，但不应被假定为精确的接触动力学预测器。
-- **HOW**：从短视频建立交互式数字孪生，模拟多条候选动作，把未来结果渲染成视觉提示，再由 VLM 排序并由采样式 MPC 执行。
-- **WHAT**：论文在八类真实接触操作任务上验证，并通过消融支持显式物理建模的作用。
-- **读后判断**：世界模型最稳健的近期角色可能是“候选生成与反事实比较器”，而不是完全替代控制器。
-- **应补实验**：系统扫描物理模型误差、视觉重建误差、VLM 排序误差，确定三者各自在何处成为瓶颈。
+- **WHY**：二维视频生成可能在单视角看似合理，却无法保持物体三维形状、遮挡关系和跨视角一致。
+- **HOW**：用 RGB-DN 视频微调生成模型，联合预测 RGB、depth、normal，并转换成动作条件 4D 场景。
+- **WHAT**：ICCV 论文报告更好的时空一致性，并展示对 inverse dynamics 和下游 embodied task 的帮助。
+- **读后判断**：4D 表示是正确方向，但伪 depth/normal 的系统偏差可能被误认为物理规律。
+- **应补实验**：将真实 RGB-D、小比例高质量标注、单目伪标签分开训练，测几何误差如何传导到策略收益。
 
-### 4.4 Provably-Safe Online SysID：学习未知参数时也要安全
+### 4.4 Robo3R：重建指标必须对齐操作需求
 
-- **WHY**：系统辨识需要激励，激励动作却可能碰撞或违反输入约束。
-- **HOW**：安全轨迹规划器产生可跟踪且有信息量的动作，鲁棒辨识器在有界噪声下更新未知惯量参数集合。
-- **WHAT**：机械臂未知载荷实验显示可以边执行边缩小参数界，同时维持论文设定下的安全保证。
-- **读后判断**：未来机器人适配不应只问“学得快不快”，还应问“辨识期间能否证明不会越界”。
-- **应补实验**：将刚性未知载荷扩展到摩擦、柔性和间歇接触，并检查模型集合失配时保证如何退化。
+- **WHY**：通用重建模型可能缺少 metric scale、robot-frame 对齐和接触区域精度，深度传感器又受噪声与材质影响。
+- **HOW**：联合局部几何与相机姿态，用 learned similarity transform 对齐机器人坐标系，并以 masked point head 与 keypoint PnP 精化点云和外参。
+- **WHAT**：RSS 官方摘要报告其在模仿学习、sim-to-real、抓取合成和无碰规划等下游任务上获得一致收益。
+- **读后判断**：这类工作应成为“三维重建 × 机器人视觉”的核心范式：不是只提高 Chamfer，而是证明几何改善改变任务结果。
+- **应补实验**：按透明/反光、遮挡、细小结构、标定偏差和动态物体分桶，比较重建误差与任务失败的因果关联。
 
-## 5. 未来值得研究的独立方向
+## 5. 未来值得研究的方向
 
-### R1. 可校准、可拒绝、可恢复的通用策略
+### V1. Task-aligned 3D perception：面向任务损失的三维视觉
 
-**假设**：若策略显式预测任务条件下的失败概率，并配套拒绝/求助/恢复策略，则在相同平均成功率下可显著降低灾难性长尾失败。
+**假设**：以抓取、避碰、可达性或导航风险作为辅助目标，比只优化深度/点云平均误差更能保留关键几何。
 
-- 变化：从单一 action policy 改为 `action + calibrated risk + recovery option`。
-- 最小实验：在标准操作任务中注入遮挡、物体替换、指令歧义、夹持滑移和执行器降级。
-- 指标：risk-coverage、ECE、最差任务成功率、无人干预完成率、恢复成本。
-- 证伪：风险头无法比简单 ensemble/阈值更好预测失败，或拒绝造成任务完成率不可接受。
+- 方法变化：共享 3D encoder，分别输出 metric geometry、task affordance 和 calibrated uncertainty。
+- 最小实验：构造相同平均深度误差但薄结构/接触边界不同的样本。
+- 指标：几何误差 + grasp success、collision recall、planning success、风险覆盖率。
+- 证伪：任务收益完全可由更高分辨率或更多数据解释，任务辅助目标没有独立贡献。
 
-### R2. 预算公平的机器人数据引擎
+### V2. 开放词汇、长期一致的语义地图
 
-**假设**：在固定真实机器人时间与计算预算下，主动采样 + 失败回放 + 少量 RL rollout 比单纯扩大人类示范集更有效。
+**假设**：对象级 persistent memory + 视觉语言检索 + 几何证据追踪，能比逐帧 open-vocabulary segmentation 更可靠地支持长期搜索与问答。
 
-- 对照：human demo、teleoperation correction、RL-generated data、synthetic video/action、mixed curriculum。
-- 必须统一：机器人小时数、人工标注时间、GPU 小时数和安全中断次数。
-- 价值：建立“每 100 小时新增数据带来多少可靠能力”的可比较数据效率标准。
+- 关键问题：同一对象跨视角/跨时间 identity、状态变化、错误标签回滚和遗忘。
+- 指标：跨天 object retrieval、地图问答正确率、重复对象关联、变化检测和错误修复成本。
 
-### R3. 语义世界模型与可验证控制的分层接口
+### V3. 面向任务信息增益的主动视觉
 
-**假设**：让生成式/VLM 世界模型只提出子目标和候选未来，由 model-based planner、CBF/MPC 或 reachability 后端执行硬约束，会比纯生成控制获得更好的分布外安全—任务 Pareto。
+**假设**：直接选择最能降低任务失败不确定性的观测，比最大化覆盖率、熵或渲染质量更高效。
 
-- 关键接口：状态抽象、约束语言、置信集合、候选多样性和回退条件。
-- 评价：不只看成功率，还看约束违反、错误自信、重规划频率和最坏执行时间。
+- 任务：遮挡货架目标搜索、抓取前视点选择、狭窄空间导航。
+- 对照：coverage、geometric uncertainty、semantic uncertainty、task-value information gain。
+- 指标：单位移动成本的任务成功增益、观测次数、碰撞/操作风险。
 
-### R4. 视觉—触觉—本体感受的接触基础策略
+### V4. 几何一致且带不确定性的视觉世界模型
 
-**假设**：以接触事件和力闭环为中心的预训练，比仅在视觉动作序列上扩模更能改善插接、布料、工具和滑移恢复。
+**假设**：在视频生成中联合约束相机、depth、normal、object motion 和 epistemic uncertainty，可提高候选行动排序而不必追求完全精确的长期像素生成。
 
-- 数据单元：接触前状态—接触瞬态—稳定交互—失败/恢复，而非均匀视频帧。
-- 最小 benchmark：跨三种传感器、两种机械手和未知材料测试；分别遮蔽视觉、触觉和力矩输入做消融。
+- 评价分层：像素 → 几何/运动 → 候选排序 → 闭环成功。
+- 证伪：更好的 4D 几何指标不改善行动排序，说明瓶颈在目标/value 或策略接口。
 
-### R5. 持续适配但不灾难遗忘的机器人
+### V5. 人类视频—仿真—机器人视频的视觉对齐
 
-**假设**：结构化 fast parameters（载荷、摩擦、执行器、地形）与慢速语义/技能参数分离，可在在线适配时减少旧技能退化。
+**假设**：以对象状态变化、手—物交互和相机运动为中间视觉语言，比直接统一 action token 更能利用无机器人动作标注的人类视频。
 
-- 比较：full fine-tuning、LoRA、latent context、Bayesian parameter filter、neural residual。
-- 指标：适配样本数、旧任务保持率、错误适配恢复时间、分布切换后的 regret。
+- 关键变量：视角差异、手/夹爪形态、动作时标和不可观测力。
+- 最小实验：固定机器人示范量，逐步增加人类视频和合成视频，测少样本任务迁移。
 
-### R6. 具身设计—控制—学习联合优化
+### V6. 可诊断的视觉—动作模型
 
-**假设**：若把可制造性、能耗、感知可观性和策略可学习性共同放入设计环，得到的机器人会比“先定硬件、后学策略”更具任务效率。
+**假设**：让模型同时给出可验证的中间视觉结论（目标、部件、姿态、可供性、预计接触点），能更早发现错误并改善回退，而不显著损害端到端性能。
 
-- 最小范围：只优化一个末端执行器或腿足机构，避免一开始做全机器人搜索。
-- 风险：仿真偏差可能让设计利用不可实现的物理漏洞；必须有原型或 hardware-in-the-loop 闭环。
+- 对照：纯端到端 VLA、显式模块化 pipeline、共享 backbone 多头模型。
+- 指标：错误定位准确率、干预收益、OOD failure AUROC、最终任务成功率和延迟。
+
+### V7. 多模态极端视觉感知
+
+**假设**：RGB 与 event、thermal、偏振或稀疏深度在光照突变、低纹理和尘埃遮挡下进行不确定性感知融合，可比固定早/晚融合更稳健。
+
+- 方法重点：缺失模态、冲突模态和标定漂移下的动态可信度分配。
+- 价值：作为独立机器视觉问题成立，也能自然迁移到夜间、工业和月/火星场景。
 
 ## 6. 推荐阅读顺序
 
-1. A*、Impedance Control、RRT、Monte Carlo Localization：建立搜索—控制—不确定性的基础语言。
-2. Deep Visuomotor Policy、Domain Randomization、QT-Opt：理解大规模机器人学习的起点和代价。
-3. RT-1、Diffusion Policy、RT-2、Open X-Embodiment：理解现代通用策略为何出现。
-4. π₀、SpatialVLA、RLDG：比较模型、表征和数据三条扩展路径。
-5. Prompting with the Future、Provably-Safe SysID、NeuralActuator：补上物理、辨识与保证。
-6. FlashSAC、Muninn、FP3、ETac：追踪 2026 年实时学习、三维策略与触觉基础设施。
+1. Visual Servoing、MonoSLAM/PTAM、ORB-SLAM：理解视觉如何进入闭环任务与持久状态估计。
+2. PointNet、DenseFusion、Transporter Networks：理解点云、RGB-D 姿态和任务空间视觉表示。
+3. Habitat、R3M、VC-1、Diffusion Policy：理解 embodied benchmark、视觉预训练与视觉策略。
+4. Open X-Embodiment/OpenVLA、3D-MVP、SpatialVLA：比较通用视觉、三维预训练和空间化 VLA。
+5. Navigation World Models、4D Embodied World Models：理解动作条件视觉未来及其证据边界。
+6. Map Space Belief、Robo3R、FindAnything：理解主动视觉、任务导向三维感知和开放世界地图。
 
-## 7. 选择课题时的三个警示
+## 7. 选题警示
 
-- 不要把“换一个更大的 VLM/VLA”本身当研究问题；必须指出动作、数据、反馈或评价发生了什么机制变化。
-- 不要只报告平均成功率；机器人系统最重要的信息常在最差任务、失败后果和恢复过程。
-- 不要让仿真任务定义替代真实问题定义；至少要证明策略没有依赖不可观测状态、精确重置或 simulator artifact。
+- 不要把“在机器人数据上使用一个 CV backbone”当作充分贡献；应说明视觉表征为什么适合该任务，并做机制消融。
+- 不要只报告重建/检测指标或只报告任务成功率；应建立视觉误差到任务失败的关联。
+- 不要把仿真中可直接读取的 depth、pose、semantic label 偷渡到真实系统；必须列出测试时可观测输入。
+- 不要默认 VLA 的收益来自视觉理解；语言模型、数据规模、动作 tokenizer 和后训练都可能是混杂因素。
 
 ## 参考来源说明
 
-经典工作优先链接 DOI、作者主页或正式论文；近两年工作优先 RSS/ICRA 官方页面。RSS 2026 和 ICRA 2026 的奖项页面可证明论文的会议与奖项/候选身份，但不能替代全文证据，因此对仅由奖项页支持的论文没有写入未经全文核对的数值结论。
+经典工作链接正式 DOI、CVF 或 PMLR；近两年条目优先 CVF、RSS、CoRL 和 ICRA 官方页面。ICRA 2026 的 FindAnything 当前仅以官方奖项页证明论文身份与代表性，因此不写入未经全文核对的数值结论。CoRL 2024 的 Physically Embodied Gaussian Splatting 由官方 program 确认收录，后续深读仍应补正式 OpenReview/PDF 证据。
