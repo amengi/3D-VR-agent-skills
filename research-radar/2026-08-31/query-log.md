@@ -2,8 +2,8 @@
 
 ## 协议
 
-- 检索日期：2026-08-31
-- 主窗口：2024-08-31 至 2026-08-31
+- 检索日期：2026-08-31；重构补检：2026-09-01
+- 主窗口：2024-09-01 至 2026-08-31
 - 语言：英语为主；中文任务词用于后续扩展，本轮未对 CNKI/万方作系统覆盖
 - 输出模式：发现 + 排序 + gap analysis + brief reading
 - 组织方式：三个方向先独立检索和筛选，再进行两两交叉及三方向闭环综合
@@ -78,7 +78,19 @@ site:openaccess.thecvf.com/content/CVPR2025 robot navigation world models
 site:roboticsproceedings.org/rss21 sim-to-real generalist policy spatial VLA task motion planning
 ```
 
-定向官方站点查询覆盖 CVF 2025/2026、RSS 2024/2025、Wiley Journal of Field Robotics、Elsevier/DOI、IEEE 记录和 arXiv。
+### 2026-09-01 发展脉络重构补检
+
+```text
+3D reconstruction milestones two-view geometry factorization SfM MVS KinectFusion NeRF Gaussian Splatting
+robotics milestones A* impedance control subsumption RRT Monte Carlo localization robot learning
+robot simulation milestones Gazebo MuJoCo CARLA Habitat Isaac Gym planetary rover terramechanics
+site:roboticsconference.org 2026 awards accepted papers robotics
+site:2026.ieee-icra.org awards robot learning perception automation
+site:openaccess.thecvf.com/content/CVPR2026 3D reconstruction VGGT
+2025 2026 lunar rover simulation digital twin terramechanics Journal of Field Robotics
+```
+
+定向官方站点查询覆盖 CVF 2024–2026、ECCV 2024、RSS 2023–2026、ICRA 2024/2026、Wiley Journal of Field Robotics、Elsevier/DOI、IEEE、NASA NTRS、PMLR/JMLR 和 arXiv。
 
 ## 来源路由与实际覆盖
 
@@ -92,25 +104,26 @@ site:roboticsproceedings.org/rss21 sim-to-real generalist policy spatial VLA tas
 
 纳入：
 
-- 直接使用月球/火星数据、仿真或任务约束；
-- 将三维表示与定位、导航、控制或 sim-to-real 连接；
-- 能明确迁移到行星约束的 CVPR/ICCV/RSS 等方法；
+- 对三个方向分别建立了学科范式或能解释当前路线来源的经典工作；
+- 近两年在 CVPR/ICCV/ECCV、RSS/ICRA 或领域代表期刊发表且具有明确方法/系统代表性的工作；
+- 仿真方向额外纳入直接使用月球/火星环境、轮壤、低重力或任务数字孪生的领域论文；
 - 有官方会议、出版社、DOI 或明确预印本记录。
 
 排除/降级：
 
 - 只有营销页面或无法确认题录；
-- 仅因标题含 digital twin/robot 而与三维、仿真或行星约束无实质关系；
+- 仅因标题含 digital twin/robot/3D 而没有清晰问题、方法或验证贡献；
 - 把 arXiv 默认为同行评议；
-- 仅有平均视觉质量提升、无法提出具体行星验证路径的泛 3D 论文。
+- 只因能与另外两个方向交叉而入选、但在本方向本身缺乏代表性的论文；
+- 仅有平均指标提升、没有方法机制或可靠性信息的增量工作。
 
 ## 已知覆盖偏差
 
-- 顶会方法偏重 CVPR/RSS，工程期刊与任务档案仍需扩展。
+- 顶会方法仍偏重 CVPR/RSS，TPAMI/IJCV/TRO/IJRR/RA-L 和 ICRA/IROS 的近两年系统覆盖仍需扩展。
 - 月球材料多于火星，尤其缺少近两年的火星真实任务闭环研究。
 - 公开英文资源占主导，中文任务论文与学位论文尚未系统检索。
 - 2026 年论文较新，引用数不稳定，因此本轮不使用引用数排序。
-- `paper-catalog.json` 只有年份字段；精确窗口判断在报告层完成，near-window 论文单列。
+- `paper-catalog.json` 仍是上一版行星交叉雷达的机器可读目录，尚未扩展为本次三条独立发展线的完整经典/近期目录；精确窗口判断以三篇方向文档为准。
 
 ## 下一轮建议查询
 
