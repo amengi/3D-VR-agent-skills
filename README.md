@@ -15,7 +15,7 @@ An evidence-traceable research radar that:
 - extracts WHY/HOW/WHAT, limitations, transfer value, and research gaps;
 - proposes testable project directions with validation plans and risk levels.
 
-The machine-readable catalog contains 63 verified radar records from 2024–2026 and is intended for query expansion, not as a completeness claim.
+The machine-readable catalog contains 73 verified radar records from 2024–2026 and is intended for query expansion, not as a completeness claim.
 
 ## Validation
 
@@ -33,6 +33,7 @@ Invoke the skill as `$planetary-3d-robotics-radar`, or install/copy the skill di
 
 ## Research outputs
 
+- [2026-09-21 weekly research radar](research-radar/2026-09-21/README.md): ten new emerging papers, two ECCV status upgrades, independent ideas for all three tracks, and assurance-oriented cross-track experiments.
 - [2026-09-14 weekly research radar](research-radar/2026-09-14/README.md): nine independently selected additions across reconstruction, simulation/digital twins, and robot vision, one catalog backfill, and assurance-oriented cross-track ideas.
 - [2026-09-07 weekly research radar](research-radar/2026-09-07/README.md): six new emerging papers, independent research ideas, cross-track ideas, and a reproducible zero-hit record for simulation/digital twins.
 - [2026-08-31 planetary 3D robotics research radar](research-radar/2026-08-31/README.md): ranked recent papers, brief readings, cross-paper research directions, and a reproducible query log.
